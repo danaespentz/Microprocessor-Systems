@@ -1,0 +1,26 @@
+	IN 10H
+	LXI B,01F4H  ;delay (500ms = 01F4Hms)
+	MVI E,FEH    ;store FEH (11111110) to E --> LSB of LEDs is switched on 
+START: 
+	LDA 2000H    ;load INPUT
+	CALL DELB    ;delay of 500ms
+	RRC          ;rotate right to check if CY = 1	
+	JNC START    ;CY = 0 --> LSB dip switch is off so start again
+	RLC          ;
+	RLC          ;Rotate left to check if CY = 1
+	JC RIGHT     ;If CY = 1 go to RIGHT
+	JMP LEFT     ;else go to LEFT
+LEFT:
+	MOV A,E      ;
+	STA 3000H    ;OUTPUT to LEDs
+	RLC          ;
+	MOV E,A      ;Store new state in E
+	JMP START
+RIGHT:            
+	MOV A,E      
+	STA 3000H
+	RRC
+	MOV E,A
+	JMP START
+	
+	END

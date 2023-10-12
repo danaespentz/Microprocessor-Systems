@@ -1,0 +1,52 @@
+
+MVI D,01H
+MVI B,04H   ; BC=1024 so that DELB is observed
+
+START:
+LDA 2000H
+MVI E,FFH
+CPI 63H
+JNC GREATER ;if A < 99 jump to LOWER
+JMP LOWER      
+
+GREATER:
+CPI C8H      ;if A > 199
+JNC LOOP    ;jump to LOOP
+SUI 64H      ;else sub 100
+JMP LOWER
+
+LOOP:
+CALL DELB    ;delay
+MOV A,D
+CPI 01H
+JNZ LSB_0 ;if D < 1 --> LSB_0
+MVI D,00H    ;else D = 0 to turn off in the nect loop
+MVI A,0FH
+JMP LED
+
+LOWER:
+INR E
+SUI 0AH
+JNC LOWER
+ADI 0AH
+MOV H,A  ;load to H 
+MOV A,E  ;load A
+RLC      
+RLC
+RLC
+RLC      ;4 MSB --> decimal
+ADD H    ;4 LSD are added to A
+JMP LED
+
+LSB_0:
+MVI D,01H
+MVI A,00H
+JMP LED
+
+LED:
+CMA
+STA 3000H
+JMP START
+END
+
+

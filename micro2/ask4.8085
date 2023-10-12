@@ -1,0 +1,78 @@
+﻿START: 
+
+		LDA 2000H	;Load input from dip switches to A 
+		MOV B,A	;Save A to register B 
+A0_B0: 
+
+		ANI 01H	;A = A AND 00000001 
+		MOV C,A	;C = A 
+		MOV A,B	;A is equal to the input of dip switches 
+		ANI 02H	;A = A AND 00000010 
+AND0: 
+
+       RRC 
+       ANA C 
+       MOV D,A 
+
+A1_B1: 
+       MOV A,B 
+	   ANI 04H	;A = A AND 00000100 
+       MOV C,A	;C = A 
+	   MOV A,B 
+       ANI 08H	;A = A AND 00001000 
+
+AND1: 
+       RRC 
+       ANA C 
+       RRC 
+       MOV E,A 
+       RRC 
+       ORA E		;Save X1 at 2nd LSB 
+       MOV D,A	;Save X0 at LSB 
+A2_B2: 
+       MOV A,B	 
+       ANI 10H	;A = A AND 00010000 
+       MOV C,A	;C = A 
+       MOV A,B 
+       ANI 20H	;A = A AND 00100000 
+
+XOR0: 
+       RRC 
+       XRA C 
+       MOV E,A 
+
+A3_B3: 
+
+		MOV A,B 
+		ANI 40H	;A = A AND 01000000 
+        MOV C,A	;C = A 
+        MOV A,B 
+        ANI 80H	;A = A AND 10000000 
+
+XOR1: 
+
+       RRC 
+       XRA B  
+       RRC 
+       RRC 
+       MOV B,A 
+       RRC 
+       ORA D 
+       MOV D,A   ;X3 αποθηκεύτηκε  
+
+OR_X2: 
+
+      MOV A,B 
+      ORA E 
+      RRC 
+      RRC       
+      ORA D   ; X2 αποθηκεύτηκε στον Α 
+
+LED: 
+
+      CMA		;  Inverse logic 
+      STA 3000H	;Turn on the correct LEDs 
+	  JMP START	;Start checking again 
+
+		 
+      END 
